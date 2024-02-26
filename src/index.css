@@ -1,0 +1,12 @@
+#root,
+body,
+html {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #ddd;
+  font-family: Arial, sans-serif;
+}
