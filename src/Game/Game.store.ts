@@ -1,25 +1,47 @@
 // Import Zustand
 import { create } from 'zustand';
+import { WorldTile } from './Game.types';
 
 // Define the state and actions in your store
 interface GameState {
-  rendererDimensions: {
-    pixels: {
+  world: {
+    dimensions: {
       height: number;
       width: number;
     };
-    tiles: {
-      height: number;
-      width: number;
-    };
-    centerTile: {
-      height: number;
-      width: number;
+    grid: {
+      tiles: WorldTile[][];
     };
   };
-  setRendererPixelDimensions: (height: number, width: number) => void;
-  setRendererTileDimensions: (height: number, width: number) => void;
-  setRendererCenterTileDimensions: (height: number, width: number) => void;
+  view: {
+    dimensions: {
+      pixels: {
+        height: number;
+        width: number;
+      };
+      tiles: {
+        height: number;
+        width: number;
+      };
+      centerTile: {
+        height: number;
+        width: number;
+      };
+    };
+  };
+  player: {
+    worldPosition: {
+      x: number;
+      y: number;
+    };
+    viewPosition: {
+      x: number;
+      y: number;
+    };
+  };
+  setViewDimensionPixels: (height: number, width: number) => void;
+  setViewDimensionTiles: (height: number, width: number) => void;
+  setViewDimensionCenterTiles: (height: number, width: number) => void;
   gameStatus: 'running' | 'paused' | 'stopped' ;
   startGame: () => void;
   stopGame: () => void;
@@ -29,47 +51,77 @@ interface GameState {
 
 // Create the store
 export const useGameStore = create<GameState>((set) => ({
-  rendererDimensions: {
-    pixels: {
+  world: {
+    dimensions: {
       height: 0,
       width: 0,
     },
-    tiles: {
-      height: 0,
-      width: 0,
-    },
-    centerTile: {
-      height: 0,
-      width: 0,
+    grid: {
+      tiles: [],
     },
   },
-  setRendererPixelDimensions: (height, width) =>
+  view: {
+    dimensions: {
+      pixels: {
+        height: 0,
+        width: 0,
+      },
+      tiles: {
+        height: 0,
+        width: 0,
+      },
+      centerTile: {
+        height: 0,
+        width: 0,
+      },
+    },
+  },
+  player: {
+    worldPosition: {
+      x: 0,
+      y: 0,
+    },
+    viewPosition: {
+      x: 0,
+      y: 0,
+    },
+  },
+  setViewDimensionPixels: (height, width) =>
     set((store) => ({
-      rendererDimensions: {
-        ...store.rendererDimensions,
-        pixels: {
-          height,
-          width,
+      view: {
+        ...store.view,
+        dimensions: {
+          ...store.view.dimensions,
+          pixels: {
+            height,
+            width,
+          },
         },
       },
     })),
-  setRendererTileDimensions: (height, width) =>
+    setViewDimensionTiles: (height, width) =>
     set((store) => ({
-      rendererDimensions: {
-        ...store.rendererDimensions,
-        tiles: {
-          height,
-          width,
+      view: {
+        ...store.view,
+        dimensions: {
+          ...store.view.dimensions,
+          tiles: {
+            height,
+            width,
+          },
         },
       },
     })),
-  setRendererCenterTileDimensions: (height, width) =>
+  setViewDimensionCenterTiles: (height, width) =>
     set((store) => ({
-      rendererDimensions: {
-        ...store.rendererDimensions,
-        centerTile: {
-          height,
-          width,
+      view: {
+        ...store.view,
+        dimensions: {
+          ...store.view.dimensions,
+          centerTile: {
+            height,
+            width,
+          },
         },
       },
     })),

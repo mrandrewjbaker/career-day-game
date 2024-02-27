@@ -1,4 +1,48 @@
-import { WorldTile, WorldTileBiomeEnum } from "./Game.types"
+import { WorldTile, WorldTileBiomeEnum, worldTileBiomesArray } from "./Game.types"
+
+
+const caluculateTileBiome = (directTiles: (WorldTile | undefined)[], indirectTiles: (WorldTile | undefined)[]) => {
+  const weightedDirectTiles: (WorldTile & { weight: number })[] = [];
+  const weightedIndirectTiles: (WorldTile & { weight: number })[] = [];
+
+  directTiles.forEach((tile) => {
+    if (tile) {
+      weightedDirectTiles.push({ ...tile, weight: 1 });
+    }
+  });
+
+  indirectTiles.forEach((tile) => {
+    if (tile) {
+      weightedIndirectTiles.push({ ...tile, weight: 0.45 });
+    }
+  });
+
+  const allTiles = [...weightedDirectTiles, ...weightedIndirectTiles];
+ 
+  console.log('allTiles:', allTiles);
+
+  const randomWeight = Math.random();
+  const weightedTiles = allTiles.map((tile) => {
+    return { weight: tile.weight, tile }
+  });
+  let currentWeight = 0;
+  let mostWeightedTile: WorldTile | undefined;
+  console.log('weightedTiles:', weightedTiles);
+  weightedTiles.forEach((weightedTile) => {
+    currentWeight += weightedTile.weight;
+    if (currentWeight >= randomWeight) {
+      mostWeightedTile = weightedTile.tile;
+      return;
+    }
+  });  
+
+  if(!mostWeightedTile) {
+    // randomly grab biome if weight is not found
+    return worldTileBiomesArray[Math.floor(Math.random() * worldTileBiomesArray.length)] as WorldTileBiomeEnum;
+  }  
+
+  return mostWeightedTile.biome as WorldTileBiomeEnum;
+}
 
 export const generateNewWorldTileBiome = (x: number, y: number, worldMap: WorldTile[][]): WorldTileBiomeEnum => {
   const newBiome = WorldTileBiomeEnum.PLAINS;
@@ -7,25 +51,30 @@ export const generateNewWorldTileBiome = (x: number, y: number, worldMap: WorldT
   const maxX = x + 2;
   const maxY = y + 2;
 
-  const directTiles: WorldTile[] = [];
-  const indirectTiles: WorldTile[] = [];
+  const directTiles: (WorldTile | undefined)[] = [];
+  const indirectTiles: (WorldTile | undefined)[] = [];
 
-  for (let i = minY; i < maxY; i++) {
-    for (let j = minX; j < maxX; j++) {
-      console.log(`i=${i} j=${j}`);
-      if (i === y || j === x) {
-        directTiles.push(worldMap?.[j]?.[i]);
+  for (let currentX = minX; currentX <= maxX; currentX++) {
+    for (let currentY = minY; currentY <= maxY; currentY++) {
+
+      console.log('currentX:', currentX, 'currentY:', currentY);
+
+      if (currentX === x && currentY === y) {
+        console.log('Skipping self');
+        continue;
+      } else if (currentX <= x + 1 && currentX >= x - 1 && currentY >= y - 1 && currentY <= y + 1) {
+        console.log(`Direct tile: x: ${currentX}, y: ${currentY}`);
+        const worldTile = worldMap?.[currentX]?.[currentY];
+        directTiles.push(worldTile);
       } else {
-        indirectTiles.push(worldMap?.[j]?.[i]);
+        console.log(`Indirect tile: x: ${currentX}, y: ${currentY}`);
+        const worldTile = worldMap?.[currentX]?.[currentY];
+        indirectTiles.push(worldTile);
       }
     }
   }
 
-  console.log('Direct tiles:', directTiles);
-  console.log('Indirect tiles:', indirectTiles);
-
-  return newBiome;
-
+  return caluculateTileBiome(directTiles, indirectTiles);
 }
 
 const generateNewWorldTile = (x: number, y: number, worldMap: WorldTile[][]) => {

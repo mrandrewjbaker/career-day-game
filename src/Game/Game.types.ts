@@ -6,9 +6,13 @@ export enum WorldTileBiomeEnum {
   WATER = "water"
 }
 
+export const worldTileBiomesArray: WorldTileBiome[] = ["plains", "mountain", "water"];
 
 export interface WorldTile {
   x: number;
   y: number;
   biome: WorldTileBiome;
+}
+
+export interface UndefinedWorldTile extends Omit<WorldTile, 'biome'> {
 }

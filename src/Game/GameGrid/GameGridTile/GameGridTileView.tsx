@@ -9,12 +9,12 @@ interface GameGridTileViewProps {
 
 export const GameGridTileView: React.FC<GameGridTileViewProps> = ({ x, y }) => {
   const [GameGridTileClassNames, setGameGridTileClassNames] = useState<string[]>([]);
-  const { rendererDimensions } = useGameStore();
+  const { view } = useGameStore();
 
   const determineGameGridTileClassNames = () => {
     const newGameGridTileClassNames = [scss.GameGridTileView];
 
-    if (x === rendererDimensions.centerTile.width && y === rendererDimensions.centerTile.height) {
+    if (x === view.dimensions.centerTile.width && y === view.dimensions.centerTile.height) {
       newGameGridTileClassNames.push(scss.GameGridTileView__CenterTile);
     }
 
@@ -25,7 +25,7 @@ export const GameGridTileView: React.FC<GameGridTileViewProps> = ({ x, y }) => {
 
     determineGameGridTileClassNames();
 
-  }, [x, y, rendererDimensions.centerTile.width, rendererDimensions.centerTile.height, rendererDimensions.tiles.width, rendererDimensions.tiles.height]);
+  }, [x, y, view.dimensions.centerTile.width, view.dimensions.centerTile.height, view.dimensions.tiles.width, view.dimensions.tiles.height]);
 
   return (
     <div id={`x-${x}-y-${y}`} className={[...GameGridTileClassNames].join(' ')}>

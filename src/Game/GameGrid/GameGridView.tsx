@@ -4,26 +4,34 @@ import { useEffect, useRef, useState } from 'react';
 import scss from './GameGridView.module.scss';
 import { GameGridTileView } from './GameGridTile/GameGridTileView';
 import { generateNewWorldTileBiome } from '../Game.functions';
+import { WorldTile } from '../Game.types';
 
-export const GameViewGrid: React.FC = () => {
+interface GameViewGridProps {
+  worldGrid: WorldTile[][];
+}
+
+export const GameViewGrid: React.FC<GameViewGridProps> = ({
+  worldGrid,
+}) => {
   const gameGridViewRef = useRef<HTMLDivElement>(null);
   const [isInitalized, setIsInitalized] = useState<boolean>(false);
-  const { rendererDimensions, setRendererPixelDimensions, setRendererTileDimensions, setRendererCenterTileDimensions } = useGameStore();
+  // const { rendererDimensions, setRendererPixelDimensions, setRendererTileDimensions, setRendererCenterTileDimensions } = useGameStore();
+  const { world, view, setViewDimensionPixels, setViewDimensionTiles, setViewDimensionCenterTiles} = useGameStore();
 
   const calculateRendererSymmetricDimensions = (pixelSize: number): number => {
     return (Math.floor(pixelSize / 34)) % 2 === 0 ? Math.floor(pixelSize / 34) - 1 : Math.floor((pixelSize / 34));
   }
 
   const handleCalculateAndSetRendererDimensions = () => {
-    if (rendererDimensions.pixels.height > 0 && rendererDimensions.pixels.width > 0) {
-      setRendererTileDimensions(calculateRendererSymmetricDimensions(rendererDimensions.pixels.height), calculateRendererSymmetricDimensions(rendererDimensions.pixels.width));
-      setRendererCenterTileDimensions(Math.floor(calculateRendererSymmetricDimensions(rendererDimensions.pixels.height) / 2), Math.floor(calculateRendererSymmetricDimensions(rendererDimensions.pixels.width) / 2));
+    if (view.dimensions.pixels.height > 0 && view.dimensions.pixels.width > 0) {
+      setViewDimensionTiles(calculateRendererSymmetricDimensions(view.dimensions.pixels.height), calculateRendererSymmetricDimensions(view.dimensions.pixels.width));
+      setViewDimensionCenterTiles(Math.floor(calculateRendererSymmetricDimensions(view.dimensions.pixels.height) / 2), Math.floor(calculateRendererSymmetricDimensions(view.dimensions.pixels.width) / 2));
     }
   }
 
   const handleSetRendererPixelDimensions = () => {
     if (gameGridViewRef.current) {
-      setRendererPixelDimensions(gameGridViewRef.current.offsetHeight, gameGridViewRef.current.offsetWidth);
+      setViewDimensionPixels(gameGridViewRef.current.offsetHeight, gameGridViewRef.current.offsetWidth);
     }
   }
 
@@ -35,7 +43,7 @@ export const GameViewGrid: React.FC = () => {
       return;
     }
     handleCalculateAndSetRendererDimensions();
-  }, [rendererDimensions.pixels.height, rendererDimensions.pixels.width, isInitalized]);
+  }, [view.dimensions.pixels.height, view.dimensions.pixels.width, isInitalized]);
 
   useEffect(() => {
     window.addEventListener('resize', handleSetRendererPixelDimensions);
@@ -45,7 +53,7 @@ export const GameViewGrid: React.FC = () => {
   }, [gameGridViewRef]);
 
   useEffect(() => {
-    console.log(generateNewWorldTileBiome(1, 1, []));
+
   }, []);
 
   return (
@@ -62,17 +70,17 @@ export const GameViewGrid: React.FC = () => {
           margin: '10px',
           height: 'auto',
           width: 'auto',
-          gridTemplateRows: `repeat(${rendererDimensions.tiles.height}, 32px)`,
-          gridTemplateColumns: `repeat(${rendererDimensions.tiles.width}, 32px)`,
+          gridTemplateRows: `repeat(${view.dimensions.tiles.height}, 32px)`,
+          gridTemplateColumns: `repeat(${view.dimensions.tiles.width}, 32px)`,
         }}
       >
       {
-        rendererDimensions.tiles.height && rendererDimensions.tiles.width &&
-        rendererDimensions.tiles.height !== 0 && rendererDimensions.tiles.width !== 0 && (
-          Array(rendererDimensions.tiles.height)
+        view.dimensions.tiles.height && view.dimensions.tiles.width &&
+        view.dimensions.tiles.height !== 0 && view.dimensions.tiles.width !== 0 && (
+          Array(view.dimensions.tiles.height)
           .fill(null)
           .map((_, y) =>
-            Array(rendererDimensions.tiles.width)
+            Array(view.dimensions.tiles.width)
               .fill(null)
               .map((_, x) => (
                 <GameGridTileView x={x} y={y} key={`${x}-${y}`} />
