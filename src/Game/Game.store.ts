@@ -41,6 +41,7 @@ interface GameState {
       x: number;
       y: number;
     };
+    viewDirection: 'up' | 'down' | 'left' | 'right';
   };
   setIsWorldGridInitialized: (bool: boolean) => void;
   setIsPlayerInitialized: (bool: boolean) => void;
@@ -54,6 +55,7 @@ interface GameState {
   setViewDimensionCenterTiles: (x: number, y: number) => void;
   setPlayerWorldPosition: (x: number, y: number) => void;
   setPlayerViewPosition: (x: number, y: number) => void;
+  setPlayerViewDirection: (direction: 'up' | 'down' | 'left' | 'right') => void;
   gameStatus: 'running' | 'paused' | 'stopped';
   startGame: () => void;
   stopGame: () => void;
@@ -100,6 +102,7 @@ export const useGameStore = create<GameState>((set) => ({
       x: 0,
       y: 0,
     },
+    viewDirection: 'down',
   },
   setIsWorldGridInitialized: (bool) =>
     set(() => ({
@@ -135,6 +138,13 @@ export const useGameStore = create<GameState>((set) => ({
           x,
           y,
         },
+      },
+    })),
+  setPlayerViewDirection: (direction) =>
+    set((store) => ({
+      player: {
+        ...store.player,
+        viewDirection: direction,
       },
     })),
   setWorldDimensions: (height, width) =>

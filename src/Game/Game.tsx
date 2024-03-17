@@ -12,7 +12,7 @@ export const Game: React.FC = () => {
   const [pageLoaded, setPageLoaded] = useState(false);
   const { 
     world, setWorldGrid, 
-    player, setPlayerWorldPosition, setPlayerViewPosition,
+    player, setPlayerWorldPosition, setPlayerViewPosition, setPlayerViewDirection,
     isWorldGridInitialized, setIsWorldGridInitialized,
     isViewGridInitialized, setIsViewGridInitialized,
     isPlayerInitialized, setIsPlayerInitialized,
@@ -58,18 +58,22 @@ export const Game: React.FC = () => {
       case 'ArrowUp':
         setPlayerWorldPosition(player.worldPosition.x, player.worldPosition.y + 1);
         setPlayerViewPosition(player.viewPosition.x, player.viewPosition.y + 1);
+        setPlayerViewDirection('up');
         break;
       case 'ArrowDown':
         setPlayerWorldPosition(player.worldPosition.x, player.worldPosition.y - 1);
         setPlayerViewPosition(player.viewPosition.x, player.viewPosition.y - 1);
+        setPlayerViewDirection('down');
         break;
       case 'ArrowLeft':
         setPlayerWorldPosition(player.worldPosition.x - 1, player.worldPosition.y);
         setPlayerViewPosition(player.viewPosition.x - 1, player.viewPosition.y);
+        setPlayerViewDirection('left');
         break;
       case 'ArrowRight':
         setPlayerWorldPosition(player.worldPosition.x + 1, player.worldPosition.y);
         setPlayerViewPosition(player.viewPosition.x + 1, player.viewPosition.y);
+        setPlayerViewDirection('right');
         break;
       default:
         break;

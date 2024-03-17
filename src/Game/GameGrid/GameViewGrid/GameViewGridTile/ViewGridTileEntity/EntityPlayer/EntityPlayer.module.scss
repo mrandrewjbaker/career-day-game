@@ -6,6 +6,53 @@
   margin-top: -16px;
   overflow: visible;
 
-  background-image: url('../../../../../../Assets/Character__A1.png');
   background-size: 32px 48px;
+
+  &__Front {
+    display: block;
+    position: absolute;
+    width: 32px;
+    min-height: 48px;
+    margin-top: -16px;
+    overflow: visible;
+  
+    background-size: 32px 48px;
+    background-image: url('../../../../../../Assets/Character__A1F.png');
+  }
+
+  &__Back {
+    display: block;
+    position: absolute;
+    width: 32px;
+    min-height: 48px;
+    margin-top: -16px;
+    overflow: visible;
+  
+    background-size: 32px 48px;
+    background-image: url('../../../../../../Assets/Character__A1B.png');
+  }
+
+  &__Left {
+    display: block;
+    position: absolute;
+    width: 32px;
+    min-height: 48px;
+    margin-top: -16px;
+    overflow: visible;
+  
+    background-size: 32px 48px;
+    background-image: url('../../../../../../Assets/Character__A1L.png');
+  }
+
+  &__Right {
+    display: block;
+    position: absolute;
+    width: 32px;
+    min-height: 48px;
+    margin-top: -16px;
+    overflow: visible;
+  
+    background-size: 32px 48px;
+    background-image: url('../../../../../../Assets/Character__A1R.png');
+  }
 }

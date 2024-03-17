@@ -3,10 +3,16 @@ import { useEffect, useRef, useState } from 'react';
 import scss from './GameViewGrid.module.scss';
 import { useGameStore } from '../../Game.store';
 import { GameViewGridTile } from './GameViewGridTile/GameViewGridTile';
+import { renderBiomesForViewGridTiles } from './GameViewGrid.functions';
 
 
 export const GameViewGrid: React.FC= () => {
-  const {view} = useGameStore();
+  const {view, world} = useGameStore();
+
+  useEffect(() => {
+    renderBiomesForViewGridTiles(world.grid, {tiles: {columns: view.dimensions.tiles.columns, rows: view.dimensions.tiles.rows}});
+  }, [view.grid]);
+
   return (
     <div className={scss.GameViewGrid}
       style={{

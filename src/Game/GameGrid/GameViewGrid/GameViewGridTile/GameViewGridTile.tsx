@@ -12,7 +12,7 @@ interface GameViewGridTileProps {
 
 export const GameViewGridTile: React.FC<GameViewGridTileProps> = ({ x, y }) => {
   const [GameViewGridTileClassNames, setGameViewGridTileClassNames] = useState<string[]>([]);
-  const { view } = useGameStore();
+  const { view, world } = useGameStore();
 
 
   const determineGameViewGridTileClassNames = () => {

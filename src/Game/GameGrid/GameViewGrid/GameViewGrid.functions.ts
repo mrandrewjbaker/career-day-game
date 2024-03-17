@@ -49,3 +49,11 @@ export const isViewGridTileWalkContainer = (x: number, y: number) => {
 
   return false;
 }
+
+export const renderBiomesForViewGridTiles = (worldGrid: GameGridTile[], viewGridDimensions: {tiles: {columns: number, rows: number}}) => {
+  console.log('renderBiomesForViewGridTiles');
+  console.log('worldGrid', worldGrid);
+  console.log('viewGridDimensions', viewGridDimensions);
+  
+}
+  
