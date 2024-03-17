@@ -12,7 +12,7 @@
     background-color: #3a5479;
   }
 
-  &__CenterTile {
+  &__DEV__CenterTile {
     display: flex;
     width: 100%;
     height: 100%;
@@ -21,5 +21,15 @@
     color: white;
     justify-content: center;
     align-items: center;
+  }
+
+  &__DEV__WalkContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: #57877a;
   }
 }

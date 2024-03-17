@@ -1,0 +1,11 @@
+.EntityPlayer {
+  display: block;
+  position: absolute;
+  width: 32px;
+  min-height: 48px;
+  margin-top: -16px;
+  overflow: visible;
+
+  background-image: url('../../../../../../Assets/Character__A1.png');
+  background-size: 32px 48px;
+}

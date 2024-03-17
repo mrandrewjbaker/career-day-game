@@ -2,7 +2,7 @@ import { useGameStore } from '../Game.store';
 import scss from './GameMenu.module.scss';
 
 export const GameMenu: React.FC = () => {
-  const { rendererDimensions, gameStatus } = useGameStore();
+  const { gameStatus } = useGameStore();
 
   const gameMenuOptions = [
     {

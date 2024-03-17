@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import scss from './Game.module.scss';
 import { GameViewGrid } from './GameGrid/GameViewGrid/GameViewGrid';
 import { GameGridTile } from './GameGrid/GameGrid.types';
-import { calculateGameViewGridSymmetricDimensions, generateNewGameWorldStartingPosition, initializeNewGameWorldGrid } from './Game.functions';
+import { calculateGameViewGridSymmetricDimensions, generateNewGameWorldGridStartingPosition, initializeNewGameWorldGrid } from './Game.functions';
 import { useGameStore } from './Game.store';
+
+import scss from './Game.module.scss';
+import "nes.css/css/nes.min.css";
+
 
 export const Game: React.FC = () => {
   const [pageLoaded, setPageLoaded] = useState(false);
@@ -21,9 +24,15 @@ export const Game: React.FC = () => {
   const gameViewGridContainerRef = useRef<HTMLDivElement>(null);
 
   const handleInitializeNewGameWorldGrid = (size: 's' | 'm' | 'l') => {
-    const newGameWorldGrid = initializeNewGameWorldGrid(size);
-    setWorldGrid(newGameWorldGrid);
-    setIsWorldGridInitialized(true);
+    console.log('size', size);
+    console.log('isWorldGridInitialized', isWorldGridInitialized);
+    if (!isWorldGridInitialized) {
+      const newGameWorldGrid = initializeNewGameWorldGrid(size);
+      setWorldGrid(newGameWorldGrid);
+      console.log('newGameWorldGrid', newGameWorldGrid);
+      setIsWorldGridInitialized(true);
+      console.log('%c Game.tsx handleInitializeNewGameWorldGrid', 'color: green');
+    }
   }
 
   const handleWindowResize = () => {
@@ -40,29 +49,63 @@ export const Game: React.FC = () => {
     }
   }
 
+  const handleKeyboardInput = (e: KeyboardEvent) => {
+    console.log('e.key', e.key);
+    console.log('isViewGridInitialized', isViewGridInitialized);
+    console.log('isWorldGridInitialized', isWorldGridInitialized);
+    console.log('isPlayerInitialized', isPlayerInitialized);
+    switch (e.key) {
+      case 'ArrowUp':
+        setPlayerWorldPosition(player.worldPosition.x, player.worldPosition.y + 1);
+        setPlayerViewPosition(player.viewPosition.x, player.viewPosition.y + 1);
+        break;
+      case 'ArrowDown':
+        setPlayerWorldPosition(player.worldPosition.x, player.worldPosition.y - 1);
+        setPlayerViewPosition(player.viewPosition.x, player.viewPosition.y - 1);
+        break;
+      case 'ArrowLeft':
+        setPlayerWorldPosition(player.worldPosition.x - 1, player.worldPosition.y);
+        setPlayerViewPosition(player.viewPosition.x - 1, player.viewPosition.y);
+        break;
+      case 'ArrowRight':
+        setPlayerWorldPosition(player.worldPosition.x + 1, player.worldPosition.y);
+        setPlayerViewPosition(player.viewPosition.x + 1, player.viewPosition.y);
+        break;
+      default:
+        break;
+    }
+  }
+
   useEffect(() => {
+    console.log('%c Game.tsx useEffect([gameViewGridContainerRef, isViewGridInitialized, isWorldGridInitialized, isPlayerInitialized])', 'color: green');
+    console.log('gameViewGridContainerRef', gameViewGridContainerRef);
+    console.log('isViewGridInitialized', isViewGridInitialized);
+    console.log('isWorldGridInitialized', isWorldGridInitialized);
+    console.log('isPlayerInitialized', isPlayerInitialized);
+
+
     handleInitializeGameViewGridPixelDimensions();
 
-    if (!isViewGridInitialized) {
-      setIsViewGridInitialized(true);
-    }
-
-    window.addEventListener('resize', handleWindowResize);
-
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    }
-  }, [gameViewGridContainerRef, isViewGridInitialized, pageLoaded]);
-
-  useEffect(() => {
-    console.log('%c Game.tsx useEffect([world.grid])', 'color: green');
     if (isWorldGridInitialized && !isPlayerInitialized) {
-      const newGameWorldStartingPosition = generateNewGameWorldStartingPosition(world.grid);
-      setPlayerWorldPosition(newGameWorldStartingPosition.x, newGameWorldStartingPosition.y);
+      const newGameWorldGridStartingPosition = generateNewGameWorldGridStartingPosition(world.grid);
+      setPlayerWorldPosition(newGameWorldGridStartingPosition.x, newGameWorldGridStartingPosition.y);
       setPlayerViewPosition(0, 0);
       setIsPlayerInitialized(true);
     }
-  }, [world.grid, isWorldGridInitialized]);
+
+
+    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener('keydown', handleKeyboardInput);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+      window.removeEventListener('keydown', handleKeyboardInput);
+    }
+
+    console.log('%c Game.tsx useEffect([world.grid])', 'color: green');
+
+  }, [gameViewGridContainerRef, isViewGridInitialized, isWorldGridInitialized, isPlayerInitialized, pageLoaded, player.worldPosition.x, player.worldPosition.y, player.viewPosition.x, player.viewPosition.y, world.grid]);
+
 
 
   useEffect(() => {

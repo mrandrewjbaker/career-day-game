@@ -7,6 +7,7 @@
   width: 98%;
   margin: auto;
   background-color: #2c2c2c;
+  border-radius: 10px;
 
   &__ViewGridContainer {
     display: flex;
@@ -15,5 +16,6 @@
     align-items: center;
     height: 100%;
     width: 100%;
+    border-radius: 10px;
   }
 }

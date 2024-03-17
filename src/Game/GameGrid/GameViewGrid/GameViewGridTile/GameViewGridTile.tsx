@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from '../../../Game.store';
 import scss from './GameViewGridTile.module.scss';
+import { isViewGridTileWalkContainer } from '../GameViewGrid.functions';
+import { GameGridTileBiomeEnum } from '../../GameGrid.types';
+import { ViewGridTileEntity } from './ViewGridTileEntity/ViewGridTileEntity';
 
 interface GameViewGridTileProps {
   x: number;
@@ -16,13 +19,16 @@ export const GameViewGridTile: React.FC<GameViewGridTileProps> = ({ x, y }) => {
     const newGameViewGridTileClassNames = [scss.GameViewGridTile];
 
     if (x === view.dimensions.centerTile.x && y === view.dimensions.centerTile.y) {
-      newGameViewGridTileClassNames.push(scss.GameViewGridTile__CenterTile);
+      newGameViewGridTileClassNames.push(scss.GameViewGridTile__DEV__CenterTile);
     }
+    if (isViewGridTileWalkContainer(x, y)) {
+      newGameViewGridTileClassNames.push(scss.GameViewGridTile__DEV__WalkContainer);
+    }
+    
 
     setGameViewGridTileClassNames([...newGameViewGridTileClassNames]);
   }
 
-  
 
   useEffect(() => {
     determineGameViewGridTileClassNames();
@@ -30,7 +36,7 @@ export const GameViewGridTile: React.FC<GameViewGridTileProps> = ({ x, y }) => {
 
   return (
     <div id={`x-${x}-y-${y}`} className={[...GameViewGridTileClassNames].join(' ')}>
-      {x},{y}
+      <ViewGridTileEntity x={x} y={y} />
     </div>
   );
 }

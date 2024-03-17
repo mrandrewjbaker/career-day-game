@@ -7,7 +7,7 @@ export const generateNewGameGridTileBiome = (newGameWorldGrid: GameGridTile[]): 
   return newGameWorldTileBiome;
 };
 
-export const generateNewGameWorldStartingPosition = (newGameWorldGrid: GameGridTile[]): GameGridTilePosition => {
+export const generateNewGameWorldGridStartingPosition = (newGameWorldGrid: GameGridTile[]): GameGridTilePosition => {
   console.log('%c generateNewGameWorldStartingPosition()', 'color: red');
   const minX = newGameWorldGrid[0].position.x;
   const maxX = newGameWorldGrid[newGameWorldGrid.length - 1].position.x;
@@ -72,4 +72,8 @@ export const calculateGameViewGridSymmetricDimensions = (
       ? Math.floor(gameViewGridPixelsHeight / 34) - 1
       : Math.floor((gameViewGridPixelsHeight / 34)),
   }
+}
+
+export const playerMove = (direction: 'up' | 'down' | 'left' | 'right') => {
+  console.log('%c playerMove()', 'color: red');
 }
