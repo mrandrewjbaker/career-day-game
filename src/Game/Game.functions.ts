@@ -1,104 +1,75 @@
-import { WorldTile, WorldTileBiomeEnum, worldTileBiomesArray } from "./Game.types"
+import { GameGridTile, GameGridTileBiomeEnum, GameGridTilePosition } from "./GameGrid/GameGrid.types";
 
+export const generateNewGameGridTileBiome = (newGameWorldGrid: GameGridTile[]): GameGridTileBiomeEnum => {
+  let newGameWorldTileBiome = GameGridTileBiomeEnum.PLAINS;
 
-const caluculateTileBiome = (directTiles: (WorldTile | undefined)[], indirectTiles: (WorldTile | undefined)[]) => {
-  const weightedDirectTiles: (WorldTile & { weight: number })[] = [];
-  const weightedIndirectTiles: (WorldTile & { weight: number })[] = [];
+  console.log("newGameWorldTileBiome", newGameWorldTileBiome);
+  return newGameWorldTileBiome;
+};
 
-  directTiles.forEach((tile) => {
-    if (tile) {
-      weightedDirectTiles.push({ ...tile, weight: 1 });
-    }
-  });
+export const generateNewGameWorldStartingPosition = (newGameWorldGrid: GameGridTile[]): GameGridTilePosition => {
+  console.log('%c generateNewGameWorldStartingPosition()', 'color: red');
+  const minX = newGameWorldGrid[0].position.x;
+  const maxX = newGameWorldGrid[newGameWorldGrid.length - 1].position.x;
+  const minY = newGameWorldGrid[0].position.y;
+  const maxY = newGameWorldGrid[newGameWorldGrid.length - 1].position.y;
 
-  indirectTiles.forEach((tile) => {
-    if (tile) {
-      weightedIndirectTiles.push({ ...tile, weight: 0.45 });
-    }
-  });
+  let newGameWorldStartingPosition: GameGridTilePosition = { x: 0, y: 0 };
+  // Generate new game world starting position.
+  newGameWorldStartingPosition.x = Math.floor(Math.random() * (maxX - minX) + minX);
+  newGameWorldStartingPosition.y = Math.floor(Math.random() * (maxY - minY) + minY);
 
-  const allTiles = [...weightedDirectTiles, ...weightedIndirectTiles];
- 
-  console.log('allTiles:', allTiles);
-
-  const randomWeight = Math.random();
-  const weightedTiles = allTiles.map((tile) => {
-    return { weight: tile.weight, tile }
-  });
-  let currentWeight = 0;
-  let mostWeightedTile: WorldTile | undefined;
-  console.log('weightedTiles:', weightedTiles);
-  weightedTiles.forEach((weightedTile) => {
-    currentWeight += weightedTile.weight;
-    if (currentWeight >= randomWeight) {
-      mostWeightedTile = weightedTile.tile;
-      return;
-    }
-  });  
-
-  if(!mostWeightedTile) {
-    // randomly grab biome if weight is not found
-    return worldTileBiomesArray[Math.floor(Math.random() * worldTileBiomesArray.length)] as WorldTileBiomeEnum;
-  }  
-
-  return mostWeightedTile.biome as WorldTileBiomeEnum;
+  console.log("newGameWorldStartingPosition", newGameWorldStartingPosition);
+  return newGameWorldStartingPosition;
 }
 
-export const generateNewWorldTileBiome = (x: number, y: number, worldMap: WorldTile[][]): WorldTileBiomeEnum => {
-  const newBiome = WorldTileBiomeEnum.PLAINS;
-  const minX = x - 2;
-  const minY = y - 2;
-  const maxX = x + 2;
-  const maxY = y + 2;
+export const initializeNewGameWorldGrid = (size: 's' | 'm' | 'l'): GameGridTile[] => {
+  console.log('%c initializeNewGameWorldGrid()', 'color: red');
+  let newGameWorldGridSize = 250;
+  switch (size) {
+    case 's':
+      newGameWorldGridSize = 250;
+      break;
+    case 'm':
+      newGameWorldGridSize = 500;
+      break;
+    case 'l':
+      newGameWorldGridSize = 1000;
+      break;
+    default:
+      newGameWorldGridSize = 250;
+  }
 
-  const directTiles: (WorldTile | undefined)[] = [];
-  const indirectTiles: (WorldTile | undefined)[] = [];
+  const minX = newGameWorldGridSize * -1;
+  const maxX = newGameWorldGridSize;
+  const minY = newGameWorldGridSize * -1;
+  const maxY = newGameWorldGridSize;
 
-  for (let currentX = minX; currentX <= maxX; currentX++) {
-    for (let currentY = minY; currentY <= maxY; currentY++) {
-
-      console.log('currentX:', currentX, 'currentY:', currentY);
-
-      if (currentX === x && currentY === y) {
-        console.log('Skipping self');
-        continue;
-      } else if (currentX <= x + 1 && currentX >= x - 1 && currentY >= y - 1 && currentY <= y + 1) {
-        console.log(`Direct tile: x: ${currentX}, y: ${currentY}`);
-        const worldTile = worldMap?.[currentX]?.[currentY];
-        directTiles.push(worldTile);
-      } else {
-        console.log(`Indirect tile: x: ${currentX}, y: ${currentY}`);
-        const worldTile = worldMap?.[currentX]?.[currentY];
-        indirectTiles.push(worldTile);
-      }
+  let newGameWorldGrid: GameGridTile[] = [];
+  for (let x = minX; x < maxX; x++) {
+    for (let y = minY; y < maxY; y++) {
+      newGameWorldGrid.push(
+        {
+          position: { x, y },
+          biome: GameGridTileBiomeEnum.UNINITIALIZED,
+        }
+      );
     }
   }
 
-  return caluculateTileBiome(directTiles, indirectTiles);
+  return newGameWorldGrid;
 }
 
-const generateNewWorldTile = (x: number, y: number, worldMap: WorldTile[][]) => {
-  const newWorldTile: WorldTile = {
-    x: x,
-    y: y,
-    biome: "plains"
-  };
-  worldMap[x][y] = newWorldTile;
-
-  return newWorldTile;
-}
-
-export const generateNewWorldMap = (size: number) => {
-  const newWorldMap: WorldTile[][] = [];
-  for (let x = 0; x < size; x++) {
-    newWorldMap[x] = [];
-    for (let y = 0; y < size; y++) {
-      newWorldMap[x][y] = {
-        x: x,
-        y: y,
-        biome: generateNewWorldTileBiome(x, y, newWorldMap) || "plains"
-      };
-    }
+export const calculateGameViewGridSymmetricDimensions = (
+  gameViewGridPixelsHeight: number, 
+  gameViewGridPixelsWidth: number,
+) => {
+  return {
+    colunns: (Math.floor(gameViewGridPixelsWidth / 34)) % 2 === 0 
+      ? Math.floor(gameViewGridPixelsWidth / 34) - 1
+      : Math.floor((gameViewGridPixelsWidth / 34)),
+    rows: (Math.floor(gameViewGridPixelsHeight / 34)) % 2 === 0
+      ? Math.floor(gameViewGridPixelsHeight / 34) - 1
+      : Math.floor((gameViewGridPixelsHeight / 34)),
   }
 }
-

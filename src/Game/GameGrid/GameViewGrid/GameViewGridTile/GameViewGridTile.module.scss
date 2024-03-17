@@ -1,12 +1,16 @@
-.GameGridTileView {
+.GameViewGridTile {
   display: flex;
   width: 100%;
   height: 100%;
-  background-color: blue;
+  background-color: #576287;
   font-size: 10px;
   color: white;
   justify-content: center;
   align-items: center;
+
+  &:hover {
+    background-color: #3a5479;
+  }
 
   &__CenterTile {
     display: flex;

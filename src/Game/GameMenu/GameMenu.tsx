@@ -16,7 +16,7 @@ export const GameMenu: React.FC = () => {
     {
       label: "Save & Quit",
       path: "/save-quit"
-    }
+    },
   ]
 
 

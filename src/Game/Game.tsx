@@ -1,81 +1,100 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import scss from './Game.module.scss';
-import { WorldTile } from './Game.types';
-import { GameViewGrid } from './GameGrid/GameGridView';
+import { GameViewGrid } from './GameGrid/GameViewGrid/GameViewGrid';
+import { GameGridTile } from './GameGrid/GameGrid.types';
+import { calculateGameViewGridSymmetricDimensions, generateNewGameWorldStartingPosition, initializeNewGameWorldGrid } from './Game.functions';
+import { useGameStore } from './Game.store';
 
 export const Game: React.FC = () => {
   const [pageLoaded, setPageLoaded] = useState(false);
-  const [worldInitialized, setWorldInitialized] = useState(false);  
+  const { 
+    world, setWorldGrid, 
+    player, setPlayerWorldPosition, setPlayerViewPosition,
+    isWorldGridInitialized, setIsWorldGridInitialized,
+    isViewGridInitialized, setIsViewGridInitialized,
+    isPlayerInitialized, setIsPlayerInitialized,
+    isGameRunning, setIsGameRunning,
+    view,
+    setViewDimensionPixels, setViewDimensionTiles, setViewDimensionCenterTiles,
+  } = useGameStore();
 
-  const worldGrid: WorldTile[][] = [];
+  const gameViewGridContainerRef = useRef<HTMLDivElement>(null);
 
-  const randomizePlayerStartingPosition = (minX: number, maxX: number, minY: number, maxY: number) => {
-    const playerStartingPosition = {
-      x: Math.floor(Math.random() * (maxX - minX + 1)) + minX,
-      y: Math.floor(Math.random() * (maxY - minY + 1)) + minY,
-    };
-    
-    return playerStartingPosition;
+  const handleInitializeNewGameWorldGrid = (size: 's' | 'm' | 'l') => {
+    const newGameWorldGrid = initializeNewGameWorldGrid(size);
+    setWorldGrid(newGameWorldGrid);
+    setIsWorldGridInitialized(true);
+  }
+
+  const handleWindowResize = () => {
+    handleInitializeGameViewGridPixelDimensions();
   }
 
 
-  const initializeNewWorldGrid = (size: 'small' | 'medium' | 'large'): void => {
-    const tempGrid: { x: number, y: number }[][] = [];
-    let columns = 0;
-    let rows = 0;
-    switch (size) {
-      case 'small':
-        columns = 250;
-        rows = 250;
-        break;
-      case 'medium':
-        columns = 500;
-        rows = 500;
-        break;
-      case 'large':
-        columns = 1000;
-        rows = 1000;
-        break;
+  const handleInitializeGameViewGridPixelDimensions = () => {
+    if (gameViewGridContainerRef.current) {
+      const symmetricalTileDimensions = calculateGameViewGridSymmetricDimensions(gameViewGridContainerRef.current.offsetHeight, gameViewGridContainerRef.current.offsetWidth);
+
+      setViewDimensionTiles(symmetricalTileDimensions.colunns, symmetricalTileDimensions.rows);
+      setIsViewGridInitialized(true);
+    }
+  }
+
+  useEffect(() => {
+    handleInitializeGameViewGridPixelDimensions();
+
+    if (!isViewGridInitialized) {
+      setIsViewGridInitialized(true);
     }
 
-    for (let i = 0; i < columns; i++) {
-      tempGrid.push([]);
-      for (let j = 0; j < rows; j++) {
-        tempGrid[i][j] = {
-          x: i,
-          y: j,
-        };
-      }
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
     }
-    
-    const playerStartingPosition = randomizePlayerStartingPosition(columns*-1, columns, rows*-1, rows);
-    console.log('playerStartingPosition:', playerStartingPosition);
-  }
+  }, [gameViewGridContainerRef, isViewGridInitialized, pageLoaded]);
+
+  useEffect(() => {
+    console.log('%c Game.tsx useEffect([world.grid])', 'color: green');
+    if (isWorldGridInitialized && !isPlayerInitialized) {
+      const newGameWorldStartingPosition = generateNewGameWorldStartingPosition(world.grid);
+      setPlayerWorldPosition(newGameWorldStartingPosition.x, newGameWorldStartingPosition.y);
+      setPlayerViewPosition(0, 0);
+      setIsPlayerInitialized(true);
+    }
+  }, [world.grid, isWorldGridInitialized]);
 
 
   useEffect(() => {
-    if (pageLoaded && !worldInitialized) {
-      initializeNewWorldGrid('large');
-    }
+    console.log('%c Game.tsx useEffect([isWorldGridInitialized, pageLoaded])', 'color: green');
 
     if (!pageLoaded) {
       setPageLoaded(true);
     }
-  }, [worldInitialized, pageLoaded]);
+
+  }, [pageLoaded]);
   
   return (
     <div className={scss.Game}>
+      <div className={scss.Game__ViewGridContainer} ref={gameViewGridContainerRef}>
       {
-        worldInitialized
-          ? <GameViewGrid worldGrid={worldGrid} />
+        isWorldGridInitialized && isViewGridInitialized
+          ? <GameViewGrid />
           : (
             <div className={scss.Game__LoadingScreen}>
-              <button onClick={() => setWorldInitialized(true)}>Small World</button>
-              <button onClick={() => setWorldInitialized(true)}>Medium World</button>
-              <button onClick={() => setWorldInitialized(true)}>Large World</button>
+              <button onClick={() => handleInitializeNewGameWorldGrid('s')}>
+                Small World
+              </button>
+              <button onClick={() => handleInitializeNewGameWorldGrid('m')}>
+                Medium World
+              </button>
+              <button onClick={() => handleInitializeNewGameWorldGrid('l')}>
+                Large World
+              </button>
             </div>
           )
       }
+      </div>
     </div>
   )
 }
